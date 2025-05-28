@@ -94,3 +94,70 @@ export const insertSettingsSchema = settingsSchema.omit({});
 export type InsertContract = z.infer<typeof insertContractSchema>;
 export type InsertClaim = z.infer<typeof insertClaimSchema>;
 export type InsertSettings = z.infer<typeof insertSettingsSchema>;
+
+// Drizzle schema for PostgreSQL
+import { pgTable, text, integer, real, timestamp, jsonb, serial } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const contracts = pgTable("contracts", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  abn: text("abn"),
+  clientInfo: jsonb("client_info").notNull().$type<{
+    name: string;
+    email?: string;
+    phone?: string;
+  }>(),
+  contractValue: real("contract_value").notNull(),
+  gstRate: real("gst_rate").notNull().default(0.1),
+  logoUrl: text("logo_url"),
+  templateItems: jsonb("template_items").notNull().$type<LineItem[]>(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const claims = pgTable("claims", {
+  id: text("id").primaryKey(),
+  contractId: text("contract_id").notNull().references(() => contracts.id, { onDelete: "cascade" }),
+  number: integer("number").notNull(),
+  date: text("date").notNull(),
+  status: text("status").notNull().$type<"Draft" | "For Assessment" | "Approved" | "Invoiced" | "Paid">(),
+  items: jsonb("items").notNull().$type<LineItem[]>(),
+  totals: jsonb("totals").notNull().$type<{
+    exGst: number;
+    gst: number;
+    incGst: number;
+  }>(),
+  attachments: jsonb("attachments").notNull().$type<Attachment[]>(),
+  changelog: jsonb("changelog").notNull().$type<ClaimChange[]>(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const settings = pgTable("settings", {
+  id: text("id").primaryKey().default("default"),
+  companyName: text("company_name").notNull().default(""),
+  companyAbn: text("company_abn").notNull().default(""),
+  defaultGstRate: real("default_gst_rate").notNull().default(0.1),
+  logoUrl: text("logo_url"),
+  adminPasswordHash: text("admin_password_hash").notNull(),
+  sessionTimeout: integer("session_timeout").notNull().default(300000),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Relations
+export const contractsRelations = relations(contracts, ({ many }) => ({
+  claims: many(claims),
+}));
+
+export const claimsRelations = relations(claims, ({ one }) => ({
+  contract: one(contracts, {
+    fields: [claims.contractId],
+    references: [contracts.id],
+  }),
+}));
