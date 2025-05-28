@@ -3,7 +3,7 @@ import { getSettings, saveSettings } from './db';
 import type { Settings } from '@shared/schema';
 
 const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
-const ADMIN_PASSWORD_ENV = process.env.VITE_ADMIN_PASSWORD || 'admin123';
+const ADMIN_PASSWORD_ENV = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
 
 export class AuthManager {
   private sessionTimer: NodeJS.Timeout | null = null;
