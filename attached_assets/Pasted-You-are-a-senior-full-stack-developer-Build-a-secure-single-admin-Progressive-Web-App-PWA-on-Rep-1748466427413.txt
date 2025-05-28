@@ -1,0 +1,196 @@
+You are a senior full-stack developer. Build a secure, single-admin Progressive Web App (PWA) on Replit to manage construction contracts and progress claims. This replaces an Excel-based workflow and must run offline with optional PDF export, attachments, and intelligent editing.
+
+---
+
+🔧 TECH STACK & SETUP
+- React (using Create React App with the PWA template)
+  - `npx create-react-app my-claims --template cra-template-pwa`
+- IndexedDB for local data (use `idb` wrapper)
+- `html2pdf.js` or `jsPDF` for PDF exports
+- bcrypt for admin password hashing
+- Optional: Workbox for caching refinements
+
+---
+
+🔐 SINGLE-ADMIN ACCESS
+- Prompt for password on first load (hash stored as Replit secret)
+- Auto-lock after 5 min inactivity
+- No signup, no user accounts—Admin only
+
+---
+
+📁 DATA STRUCTURE (IndexedDB)
+```js
+Contract {
+  id: string;
+  name: string;
+  abn: string;
+  clientInfo: { name, email, phone };
+  contractValue: number;
+  gstRate: number;
+  logoUrl: string;
+  templateItems: LineItem[];
+  createdAt: ISODateString;
+}
+
+Claim {
+  id: string;
+  contractId: string;
+  number: number;
+  date: ISODateString;
+  status: "Draft" | "For Assessment" | "Approved" | "Invoiced" | "Paid";
+  items: LineItem[];
+  totals: { exGst: number, gst: number, incGst: number };
+  attachments: Attachment[];
+  changelog: ClaimChange[];
+}
+
+LineItem {
+  id: string;
+  description: string;
+  contractValue: number;
+  percentComplete: number;
+  previousClaim: number;
+  thisClaim: number;
+}
+
+Attachment {
+  id: string;
+  claimId: string;
+  fileName: string;
+  mimeType: string;
+  blob: Blob;
+}
+
+ClaimChange {
+  timestamp: ISODateString;
+  fieldChanged: string;
+  oldValue: any;
+  newValue: any;
+}
+Include database versioning and migration strategy for future schema changes.
+
+💡 LOGIC MODULES (UTILITY FUNCTIONS)
+Create a central logic module with:
+
+calculateThisClaim(lineItem)
+
+calculateTotals(claim)
+
+cloneLastClaim(lastClaim)
+
+generateInvoicePDF(claim, contract)
+
+generateAssessmentPDF(claim, contract)
+
+These functions must be reusable across UI, exports, and backups.
+
+🧱 CORE UI / UX FLOW
+
+1. Contract Management
+
+Contract List view with Add/Edit/Delete
+
+Contract Detail view with editable fields and template line items
+
+Global Settings screen (company name, ABN, default GST, logo upload, default templates)
+
+2. Claim Management
+
+Each contract has its own Claim List view
+
+Add New Claim:
+
+Options: “Use Contract Template” | “Clone Last Claim” | “Blank Claim”
+
+Auto-increment claim number
+
+Set previousClaim = prior thisClaim
+
+Claim Detail view:
+
+Editable item table with auto calculations
+
+Attachments panel (upload, view, delete files)
+
+Status dropdown to manage lifecycle:
+
+Draft → For Assessment → Approved → Invoiced → Paid
+
+Conditional buttons:
+
+“Download Assessment” always available
+
+“Generate Invoice PDF” only when status = Approved
+
+Autosave all edits
+
+Change detection with “Unsaved Changes” warning
+
+📤 EXPORT & BACKUPS
+
+PDF outputs:
+
+Assessment Report (no invoice number)
+
+Invoice (includes ABN, totals, tax breakdown)
+
+Option: PDF with Attachments as thumbnails/pages
+
+Global backup/export:
+
+JSON export of all data
+
+Import from JSON backup
+
+Weekly backup emailed via SendGrid (Replit Secret)
+
+Optional ZIP export of all claims in PDF form
+
+📊 INTELLIGENT FEATURES
+
+Audit log on every Claim (record status changes, edits)
+
+Smart clone prompts when creating new claims
+
+Changelog viewer (per Claim)
+
+Sanity Mode (toggle in Settings):
+
+Warn if % Complete decreases
+
+Warn if claim total < $100
+
+Highlight data mismatch with contract value
+
+Optional dashboard:
+
+Graph: % claimed over time
+
+Chart: total claimed vs contract value
+
+📱 PWA & OFFLINE
+
+App must be installable and work offline (PWA manifest + Service Worker)
+
+All core features (view/edit/claim/export) must work with no internet
+
+Cache IndexedDB and app shell
+
+📦 DEPLOYMENT & MODULARITY
+
+Replit “Run” command hosts the PWA over HTTPS
+
+All logic separated into reusable modules
+
+README with full setup instructions, environment variables, and feature list
+
+Start by scaffolding the PWA shell and creating the IndexedDB schema with one Contract and Claim for testing. Confirm UI plan before implementing full Claim lifecycle and export logic.
+
+yaml
+Copy
+Edit
+
+---
+
+This prompt is **production-grade**: it sets up modular architecture, real offline support, clean data structure, and workflows for growth. Let me know if you want a **custom visual layout plan** or want to break this into **milestones** for Replit’s agent to follow more gradually.
