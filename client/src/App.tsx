@@ -22,7 +22,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/dashboard" component={Dashboard} />
-      <Route path="/" component={MainApp} />
+      <Route path="/contracts" component={MainApp} />
+      <Route path="/" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -35,6 +36,7 @@ function MainApp() {
   const [showClaimDetail, setShowClaimDetail] = useState(false);
   const [showNewClaim, setShowNewClaim] = useState(false);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState(300);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { contracts, loading: contractsLoading } = useContracts();
   const { claims, loading: claimsLoading } = useClaims(selectedContractId);
@@ -213,27 +215,76 @@ function MainApp() {
                 <i className="fas fa-clock mr-1"></i>
                 <span>{formatTime(sessionTimeRemaining)}</span>
               </div>
-              <a 
-                href="/dashboard"
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
-                title="Dashboard"
-              >
-                <i className="fas fa-chart-pie mr-2"></i>
-                Dashboard
-              </a>
-              <button 
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                title="Export Data"
-              >
-                <i className="fas fa-download"></i>
-              </button>
-              <button 
-                onClick={handleSessionExpiry}
-                className="p-2 text-muted-foreground hover:text-destructive transition-colors"
-                title="Logout"
-              >
-                <i className="fas fa-sign-out-alt"></i>
-              </button>
+              
+              {/* Desktop Navigation Menu */}
+              <nav className="hidden sm:flex items-center space-x-1">
+                <a 
+                  href="/dashboard"
+                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                  title="Dashboard Overview"
+                >
+                  <i className="fas fa-chart-pie mr-2"></i>
+                  Dashboard
+                </a>
+                <a 
+                  href="/contracts"
+                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                  title="Manage Contracts & Claims"
+                >
+                  <i className="fas fa-file-contract mr-2"></i>
+                  Contracts
+                </a>
+              </nav>
+
+              {/* Mobile Navigation - Dropdown Menu */}
+              <div className="sm:hidden relative">
+                <button 
+                  className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                  title="Navigation Menu"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  <i className="fas fa-bars"></i>
+                </button>
+                {mobileMenuOpen && (
+                  <div className="absolute right-0 top-12 bg-background border rounded-md shadow-lg z-50 min-w-[160px]">
+                    <div className="py-2">
+                      <a 
+                        href="/dashboard"
+                        className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <i className="fas fa-chart-pie mr-2"></i>
+                        Dashboard
+                      </a>
+                      <a 
+                        href="/contracts"
+                        className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <i className="fas fa-file-contract mr-2"></i>
+                        Contracts
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center space-x-2 border-l pl-4 ml-4">
+                <button 
+                  className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                  title="Export Data"
+                >
+                  <i className="fas fa-download"></i>
+                </button>
+                <button 
+                  onClick={handleSessionExpiry}
+                  className="p-2 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-muted"
+                  title="Logout"
+                >
+                  <i className="fas fa-sign-out-alt"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
