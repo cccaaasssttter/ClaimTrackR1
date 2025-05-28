@@ -217,11 +217,6 @@ function MainApp() {
     setShowClaimDetail(false);
   };
 
-  const handleClaimSelect = (claim: Claim) => {
-    setSelectedClaim(claim);
-    setShowClaimDetail(true);
-  };
-
   const handleNewClaim = () => {
     if (!selectedContract) {
       toast({
