@@ -213,6 +213,14 @@ function MainApp() {
                 <i className="fas fa-clock mr-1"></i>
                 <span>{formatTime(sessionTimeRemaining)}</span>
               </div>
+              <a 
+                href="/dashboard"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                title="Dashboard"
+              >
+                <i className="fas fa-chart-pie mr-2"></i>
+                Dashboard
+              </a>
               <button 
                 className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                 title="Export Data"
