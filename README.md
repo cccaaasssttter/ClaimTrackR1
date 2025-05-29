@@ -45,7 +45,7 @@ git clone https://github.com/yourusername/claimspro-pwa.git
 cd claimspro-pwa
 ```
 
-2. Install dependencies:
+2. Install dependencies (Required - the app won't start without this step):
 ```bash
 npm install
 ```
@@ -56,6 +56,8 @@ npm run dev
 ```
 
 4. Open your browser to `http://localhost:5000`
+
+**Important**: You must run `npm install` first to install dependencies like `tsx`, `react`, and other packages. The development server will fail to start with "tsx: not found" error if dependencies are missing.
 
 ### Default Admin Access
 - **Password**: `admin123` (change this in production)
@@ -143,6 +145,29 @@ The app can be installed on devices supporting PWA:
 - Use HTTPS in production for PWA features
 - Regular backup of IndexedDB data
 - Session timeout for automatic logout
+
+## Troubleshooting
+
+### "tsx: not found" Error
+If you see this error when running `npm run dev`, it means dependencies haven't been installed:
+```bash
+npm install
+```
+
+### Server Won't Start
+Ensure you're running Node.js 18 or higher:
+```bash
+node --version
+npm --version
+```
+
+### Port 5000 Already in Use
+If port 5000 is occupied, stop other services or change the port in `server/index.ts`
+
+### App Won't Load in Browser
+- Check that the server started successfully and shows "serving on port 5000"
+- Verify you're accessing `http://localhost:5000` (not a different port)
+- Check browser console for any JavaScript errors
 
 ## Browser Support
 
