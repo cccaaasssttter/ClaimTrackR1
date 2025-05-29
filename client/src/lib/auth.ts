@@ -86,7 +86,8 @@ export class AuthManager {
   getTimeRemaining(): number {
     if (!this.isAuthenticated) return 0;
     const elapsed = Date.now() - this.lastActivity;
-    return Math.max(0, SESSION_TIMEOUT - elapsed);
+    const remaining = SESSION_TIMEOUT - elapsed;
+    return Math.max(0, remaining);
   }
 
   async updatePassword(currentPassword: string, newPassword: string): Promise<boolean> {

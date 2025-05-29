@@ -1,0 +1,84 @@
+🔴 1. Critical Runtime Error: formatTime is not defined
+Error:
+
+ts
+Copy
+Edit
+App.tsx:42 Uncaught ReferenceError: formatTime is not defined
+Fix:
+You are using a formatTime() function without importing or defining it in App.tsx. Find that line and either:
+
+Define the formatTime() function
+
+Or import it from wherever it lives
+
+🔴 2. Broken Authentication Manager Call
+Error:
+
+ts
+Copy
+Edit
+authManager.getTimeRemaining is not a function
+Fix:
+Check authManager.ts or wherever authManager is defined. You’re calling a method that doesn’t exist. Either:
+
+Implement getTimeRemaining
+
+Or stop calling it if it's no longer relevant
+
+⚠️ 3. Invalid WebSocket URL
+Error:
+
+ts
+Copy
+Edit
+WebSocket: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=...' is invalid.
+Cause:
+You're likely constructing the WebSocket URL dynamically but missing a port or host.
+
+Fix:
+Ensure you default to the correct hostname and port in development:
+
+ts
+Copy
+Edit
+const wsURL = process.env.WS_URL || `wss://${location.hostname}:${location.port}/?token=...`;
+⚠️ 4. Prop Warnings from React
+txt
+Copy
+Edit
+Warning: React does not recognize the `hideCloseButton` prop
+Fix:
+Props like hideCloseButton aren’t native HTML attributes. Remove them from DOM elements (like <div>) or pass them only to custom components that accept them.
+
+⚠️ 5. Missing ARIA for Accessibility
+txt
+Copy
+Edit
+DialogContent requires a DialogTitle...
+Fix:
+You’re using @radix-ui/react-dialog and didn’t include a <DialogTitle />. Add it, even if it’s hidden:
+
+tsx
+Copy
+Edit
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+<DialogTitle><VisuallyHidden>Title</VisuallyHidden></DialogTitle>
+⚠️ 6. Network and Font Warnings
+txt
+Copy
+Edit
+[Intervention] Slow network is detected.
+Failed to load: segment analytics
+These are non-breaking but slow down your app in dev mode. You can disable Segment or use local fonts to improve loading.
+
+✅ What to Do Next:
+Fix the formatTime reference in App.tsx.
+
+Verify and correct authManager.getTimeRemaining.
+
+Patch WebSocket setup with a proper fallback/default.
+
+Audit any custom props leaking into raw HTML elements.
+
+Add missing accessibility structure to dialogs.

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { authManager } from '@/lib/auth';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -68,7 +69,10 @@ export function AuthModal({ isOpen, onAuthenticated }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" hideCloseButton>
+      <DialogContent className="sm:max-w-md">
+        <DialogTitle>
+          <VisuallyHidden>Admin Authentication</VisuallyHidden>
+        </DialogTitle>
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <i className="fas fa-shield-alt text-2xl text-primary"></i>
