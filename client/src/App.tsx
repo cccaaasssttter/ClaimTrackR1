@@ -19,31 +19,10 @@ import NotFound from "@/pages/not-found";
 import type { Claim, Contract } from "@shared/schema";
 
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
-  const [sessionTimeRemaining, setSessionTimeRemaining] = useState(300);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleSessionExpiry = () => {
+  const handleLogout = () => {
     authManager.logout();
     window.location.reload();
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const remaining = authManager.getTimeRemaining();
-      setSessionTimeRemaining(Math.max(0, Math.floor(remaining / 1000)));
-      
-      if (remaining <= 0) {
-        handleSessionExpiry();
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
