@@ -18,6 +18,17 @@
     <div id="root">Loading...</div>
     <script>
       console.log('HTML loaded successfully');
+      // Test if DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM is ready');
+        const root = document.getElementById('root');
+        if (root) {
+          console.log('Root element found');
+          root.innerHTML = '<h1 style="color: black; padding: 20px;">Basic HTML Test - Working!</h1><p style="color: black; padding: 0 20px;">If you see this, the HTML is loading correctly.</p>';
+        } else {
+          console.error('Root element not found');
+        }
+      });
     </script>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
