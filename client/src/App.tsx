@@ -30,7 +30,8 @@ function Router() {
 }
 
 function MainApp() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Temporarily bypass authentication for testing
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [selectedContractId, setSelectedContractId] = useState<string>("");
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [showClaimDetail, setShowClaimDetail] = useState(false);
