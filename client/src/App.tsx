@@ -9,6 +9,7 @@ import { ContractSidebar } from "@/components/ContractSidebar";
 import { ClaimsTable } from "@/components/ClaimsTable";
 import { ClaimDetailModal } from "@/components/ClaimDetailModal";
 import { NewClaimModal } from "@/components/NewClaimModal";
+import { NewContractModal } from "@/components/NewContractModal";
 import { useContracts } from "@/hooks/use-contracts";
 import { useClaims } from "@/hooks/use-claims";
 import { authManager } from "@/lib/auth";
@@ -415,6 +416,11 @@ function MainApp() {
         onOpenChange={setShowNewClaim}
         contract={selectedContract}
         onClaimCreated={handleClaimCreated}
+      />
+
+      <NewContractModal
+        open={showNewContract}
+        onOpenChange={setShowNewContract}
       />
 
       {/* Offline Banner */}
