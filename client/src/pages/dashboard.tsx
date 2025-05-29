@@ -570,7 +570,7 @@ export default function Dashboard() {
                               ${claim.totals.incGst.toLocaleString()}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {claim.lineItems.length} items
+                              {claim.items.length} items
                             </p>
                           </div>
                         </div>
