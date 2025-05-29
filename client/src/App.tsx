@@ -136,7 +136,10 @@ function Router() {
     <Switch>
       <Route path="/dashboard">
         <AuthenticatedLayout>
-          <Dashboard />
+          <div className="p-8">
+            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+            <p>Dashboard content would go here</p>
+          </div>
         </AuthenticatedLayout>
       </Route>
       <Route path="/contracts">
@@ -146,7 +149,15 @@ function Router() {
       </Route>
       <Route path="/">
         <AuthenticatedLayout>
-          <Dashboard />
+          <div className="p-8">
+            <h1 className="text-2xl font-bold mb-4">Welcome to ClaimsPro</h1>
+            <p>Your construction contract management system is ready.</p>
+            <div className="mt-4">
+              <a href="/contracts" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Go to Contracts
+              </a>
+            </div>
+          </div>
         </AuthenticatedLayout>
       </Route>
       <Route component={NotFound} />
