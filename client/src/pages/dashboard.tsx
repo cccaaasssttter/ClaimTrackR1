@@ -262,6 +262,33 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* Getting Started Message for Empty State */}
+        {totalContracts === 0 && (
+          <Card className="mb-8 bg-blue-50 border-blue-200">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="fas fa-rocket text-2xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-blue-900 mb-2">Welcome to ClaimsPro!</h3>
+              <p className="text-blue-700 mb-6 max-w-2xl mx-auto">
+                Your construction contract management dashboard is ready. To see the powerful analytics and charts in action, 
+                start by creating your first contract. Once you have contracts and claims, this dashboard will display comprehensive 
+                progress tracking, financial metrics, and visual analytics.
+              </p>
+              <div className="flex justify-center space-x-4">
+                <a href="/contracts" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                  <i className="fas fa-plus mr-2"></i>
+                  Create Your First Contract
+                </a>
+                <Button variant="outline" onClick={handleExportData}>
+                  <i className="fas fa-info-circle mr-2"></i>
+                  Learn More
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Analytics Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
