@@ -5,16 +5,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthModal } from "@/components/AuthModal";
-import { ContractSidebar } from "@/components/ContractSidebar";
-import { ClaimsTable } from "@/components/ClaimsTable";
-import { ClaimDetailModal } from "@/components/ClaimDetailModal";
-import { NewClaimModal } from "@/components/NewClaimModal";
-import { useContracts } from "@/hooks/use-contracts";
-import { useClaims } from "@/hooks/use-claims";
 import { authManager } from "@/lib/auth";
 import { initDB } from "@/lib/db";
-import { useToast } from "@/hooks/use-toast";
-import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 import type { Claim, Contract } from "@shared/schema";
 
@@ -133,35 +125,10 @@ function Router() {
   }
 
   return (
-    <Switch>
-      <Route path="/dashboard">
-        <AuthenticatedLayout>
-          <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-            <p>Dashboard content would go here</p>
-          </div>
-        </AuthenticatedLayout>
-      </Route>
-      <Route path="/contracts">
-        <AuthenticatedLayout>
-          <MainApp />
-        </AuthenticatedLayout>
-      </Route>
-      <Route path="/">
-        <AuthenticatedLayout>
-          <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Welcome to ClaimsPro</h1>
-            <p>Your construction contract management system is ready.</p>
-            <div className="mt-4">
-              <a href="/contracts" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Go to Contracts
-              </a>
-            </div>
-          </div>
-        </AuthenticatedLayout>
-      </Route>
-      <Route component={NotFound} />
-    </Switch>
+    <div>
+      <h1>ClaimsPro - Authenticated</h1>
+      <p>Login successful! The application is working.</p>
+    </div>
   );
 }
 
