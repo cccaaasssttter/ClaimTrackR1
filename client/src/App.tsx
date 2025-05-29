@@ -40,6 +40,8 @@ function MainApp() {
 
   const { contracts, loading: contractsLoading } = useContracts();
   const { claims, loading: claimsLoading } = useClaims(selectedContractId);
+  
+  console.log("MainApp render - isAuthenticated:", isAuthenticated, "contracts:", contracts?.length);
   const { toast } = useToast();
 
   const selectedContract = contracts.find(c => c.id === selectedContractId) || null;
@@ -48,14 +50,18 @@ function MainApp() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        console.log("Initializing app...");
         await initDB();
+        console.log("DB initialized");
         await authManager.initialize();
+        console.log("Auth manager initialized");
         
         // Auto-select first contract if available
         if (contracts.length > 0 && !selectedContractId) {
           setSelectedContractId(contracts[0].id);
         }
       } catch (error) {
+        console.error("Initialization error:", error);
         toast({
           title: "Initialization Error",
           description: "Failed to initialize application",
