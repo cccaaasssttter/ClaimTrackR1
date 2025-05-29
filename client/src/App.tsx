@@ -87,12 +87,20 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
 
 function Router() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initializeAuth = async () => {
-      await initDB();
-      await authManager.initialize();
-      setIsAuthenticated(authManager.getAuthenticationStatus());
+      try {
+        await initDB();
+        await authManager.initialize();
+        setIsAuthenticated(authManager.getAuthenticationStatus());
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
     initializeAuth();
@@ -101,6 +109,17 @@ function Router() {
   const handleAuthenticated = () => {
     setIsAuthenticated(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading ClaimsPro...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
