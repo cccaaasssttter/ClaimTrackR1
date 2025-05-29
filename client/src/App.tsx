@@ -34,6 +34,7 @@ function MainApp() {
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [showClaimDetail, setShowClaimDetail] = useState(false);
   const [showNewClaim, setShowNewClaim] = useState(false);
+  const [showNewContract, setShowNewContract] = useState(false);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState(300);
 
   const { contracts, loading: contractsLoading } = useContracts();
@@ -289,6 +290,23 @@ function MainApp() {
                     </div>
                   ))}
                 </div>
+              </div>
+            ) : contracts.length === 0 ? (
+              <div className="text-center py-12">
+                <i className="fas fa-plus-circle text-6xl text-primary mb-4"></i>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Welcome to ClaimsPro
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Get started by creating your first construction contract
+                </p>
+                <button 
+                  onClick={() => setShowNewContract(true)}
+                  className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <i className="fas fa-plus mr-2"></i>
+                  Create First Contract
+                </button>
               </div>
             ) : !selectedContract ? (
               <div className="text-center py-12">
