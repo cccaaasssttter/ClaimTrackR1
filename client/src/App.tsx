@@ -79,7 +79,7 @@ function MainApp() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, handleSessionExpiry]);
 
   // Listen for session expiry
   useEffect(() => {
