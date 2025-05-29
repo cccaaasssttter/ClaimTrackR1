@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useContracts } from '@/hooks/use-contracts';
 import { useClaims } from '@/hooks/use-claims';
 import { calculateContractProgress } from '@/lib/calculations';
@@ -117,55 +113,8 @@ export default function Dashboard() {
       totalClaimed,
       progress,
       claimsCount: contractClaims.length,
-      remaining: contract.contractValue - totalClaimed,
     };
   });
-
-  // Analytics data
-  const statusBreakdown = allClaims.reduce((acc, claim) => {
-    acc[claim.status] = (acc[claim.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const statusChartData = Object.entries(statusBreakdown).map(([status, count]) => ({
-    status,
-    count,
-    value: count,
-  }));
-
-  const monthlyClaimsData = allClaims.reduce((acc, claim) => {
-    const month = new Date(claim.date).toISOString().slice(0, 7); // YYYY-MM format
-    const existing = acc.find(item => item.month === month);
-    if (existing) {
-      existing.claims += 1;
-      existing.value += claim.totals.incGst;
-    } else {
-      acc.push({
-        month,
-        claims: 1,
-        value: claim.totals.incGst,
-        monthName: new Date(claim.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-      });
-    }
-    return acc;
-  }, [] as Array<{ month: string; claims: number; value: number; monthName: string }>)
-  .sort((a, b) => a.month.localeCompare(b.month))
-  .slice(-6); // Last 6 months
-
-  const contractValueData = contractProgressData.map(contract => ({
-    name: contract.name.length > 15 ? contract.name.substring(0, 15) + '...' : contract.name,
-    contractValue: contract.contractValue,
-    claimed: contract.totalClaimed,
-    remaining: contract.remaining,
-    progress: contract.progress,
-  }));
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-  // Performance metrics
-  const averageClaimValue = totalClaims > 0 ? totalClaimsValue / totalClaims : 0;
-  const averageContractSize = totalContracts > 0 ? totalContractValue / totalContracts : 0;
-  const completionRate = contractProgressData.filter(c => c.progress >= 100).length / totalContracts * 100;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -262,358 +211,105 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Getting Started Message for Empty State */}
-        {totalContracts === 0 && (
-          <Card className="mb-8 bg-blue-50 border-blue-200">
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-rocket text-2xl text-blue-600"></i>
-              </div>
-              <h3 className="text-xl font-semibold text-blue-900 mb-2">Welcome to ClaimsPro!</h3>
-              <p className="text-blue-700 mb-6 max-w-2xl mx-auto">
-                Your construction contract management dashboard is ready. To see the powerful analytics and charts in action, 
-                start by creating your first contract. Once you have contracts and claims, this dashboard will display comprehensive 
-                progress tracking, financial metrics, and visual analytics.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <a href="/contracts" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                  <i className="fas fa-plus mr-2"></i>
-                  Create Your First Contract
-                </a>
-                <Button variant="outline" onClick={handleExportData}>
-                  <i className="fas fa-info-circle mr-2"></i>
-                  Learn More
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Analytics Dashboard */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="financial">Financial</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
-            <TabsTrigger value="trends">Trends</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Claim Status Distribution */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Claim Status Distribution</CardTitle>
-                  <CardDescription>Breakdown of claims by current status</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {statusChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          dataKey="value"
-                          data={statusChartData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                        >
-                          {statusChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="text-center py-8">
-                      <i className="fas fa-chart-pie text-gray-400 text-3xl mb-3"></i>
-                      <p className="text-gray-500">No data available</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Contract Progress Overview */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contract Progress</CardTitle>
-                  <CardDescription>Individual contract completion status</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {contractProgressData.length > 0 ? (
-                    <div className="space-y-4">
-                      {contractProgressData.slice(0, 5).map((contract) => (
-                        <div key={contract.id} className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium">{contract.name}</span>
-                            <Badge variant={contract.progress >= 100 ? "default" : "secondary"}>
-                              {contract.progress.toFixed(1)}%
-                            </Badge>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Contract Progress */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Contract Progress</CardTitle>
+              <CardDescription>
+                Progress overview for all active contracts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {contractProgressData.length === 0 ? (
+                <div className="text-center py-8">
+                  <i className="fas fa-folder-open text-gray-400 text-3xl mb-3"></i>
+                  <p className="text-gray-500">No contracts yet</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {contractProgressData.map((contract) => (
+                    <div key={contract.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-foreground">{contract.name}</h4>
+                        <p className="text-sm text-muted-foreground">{contract.clientInfo.name}</p>
+                        <div className="mt-2">
+                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                            <span>Progress</span>
+                            <span>{contract.progress.toFixed(1)}%</span>
                           </div>
-                          <Progress value={Math.min(contract.progress, 100)} className="h-2" />
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>${contract.totalClaimed.toLocaleString()} claimed</span>
-                            <span>{contract.claimsCount} claims</span>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${Math.min(contract.progress, 100)}%` }}
+                            />
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <i className="fas fa-folder-open text-gray-400 text-3xl mb-3"></i>
-                      <p className="text-gray-500">No contracts yet</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Performance Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Claim Value</CardTitle>
-                  <i className="fas fa-calculator text-blue-600"></i>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold font-mono">
-                    ${averageClaimValue.toLocaleString()}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Per claim submitted
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Contract Size</CardTitle>
-                  <i className="fas fa-building text-green-600"></i>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold font-mono">
-                    ${averageContractSize.toLocaleString()}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Per contract
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-                  <i className="fas fa-check-circle text-purple-600"></i>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {completionRate.toFixed(1)}%
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Contracts completed
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="financial" className="space-y-6">
-            {/* Contract Value Analysis */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Contract Value Analysis</CardTitle>
-                <CardDescription>Contract values vs claims submitted</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {contractValueData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={contractValueData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => `$${Number(value).toLocaleString()}`} />
-                      <Legend />
-                      <Bar dataKey="contractValue" fill="#8884d8" name="Contract Value" />
-                      <Bar dataKey="claimed" fill="#82ca9d" name="Amount Claimed" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="text-center py-8">
-                    <i className="fas fa-chart-bar text-gray-400 text-3xl mb-3"></i>
-                    <p className="text-gray-500">No financial data available</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="progress" className="space-y-6">
-            {/* Detailed Progress View */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Project Progress Details</CardTitle>
-                <CardDescription>Comprehensive view of all contract progress</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {contractProgressData.length > 0 ? (
-                  <div className="space-y-6">
-                    {contractProgressData.map((contract) => (
-                      <div key={contract.id} className="p-4 border border-border rounded-lg">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h4 className="font-semibold text-lg">{contract.name}</h4>
-                            <p className="text-muted-foreground">{contract.clientInfo.name}</p>
-                          </div>
-                          <Badge variant={contract.progress >= 100 ? "default" : "secondary"}>
-                            {contract.progress >= 100 ? "Complete" : "In Progress"}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          <div className="text-center p-3 bg-blue-50 rounded-lg">
-                            <p className="text-sm text-muted-foreground">Contract Value</p>
-                            <p className="text-lg font-semibold font-mono">${contract.contractValue.toLocaleString()}</p>
-                          </div>
-                          <div className="text-center p-3 bg-green-50 rounded-lg">
-                            <p className="text-sm text-muted-foreground">Amount Claimed</p>
-                            <p className="text-lg font-semibold font-mono">${contract.totalClaimed.toLocaleString()}</p>
-                          </div>
-                          <div className="text-center p-3 bg-orange-50 rounded-lg">
-                            <p className="text-sm text-muted-foreground">Remaining</p>
-                            <p className="text-lg font-semibold font-mono">${contract.remaining.toLocaleString()}</p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Progress: {contract.progress.toFixed(1)}%</span>
-                            <span>{contract.claimsCount} claims submitted</span>
-                          </div>
-                          <Progress value={Math.min(contract.progress, 100)} className="h-3" />
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <i className="fas fa-tasks text-gray-400 text-3xl mb-3"></i>
-                    <p className="text-gray-500">No projects to track</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                      <div className="ml-4 text-right">
+                        <p className="text-sm font-medium font-mono">
+                          ${contract.totalClaimed.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {contract.claimsCount} claims
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-          <TabsContent value="trends" className="space-y-6">
-            {/* Monthly Claims Trend */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Claims Activity Trend</CardTitle>
-                <CardDescription>Monthly claims volume and value over time</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {monthlyClaimsData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={400}>
-                    <AreaChart data={monthlyClaimsData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="monthName" />
-                      <YAxis yAxisId="left" />
-                      <YAxis yAxisId="right" orientation="right" />
-                      <Tooltip 
-                        formatter={(value, name) => [
-                          name === 'value' ? `$${Number(value).toLocaleString()}` : value,
-                          name === 'value' ? 'Claim Value' : 'Number of Claims'
-                        ]}
-                      />
-                      <Legend />
-                      <Area 
-                        yAxisId="left"
-                        type="monotone" 
-                        dataKey="claims" 
-                        stackId="1"
-                        stroke="#8884d8" 
-                        fill="#8884d8" 
-                        name="Claims Count"
-                      />
-                      <Area 
-                        yAxisId="right"
-                        type="monotone" 
-                        dataKey="value" 
-                        stackId="2"
-                        stroke="#82ca9d" 
-                        fill="#82ca9d" 
-                        name="Claims Value"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="text-center py-8">
-                    <i className="fas fa-chart-line text-gray-400 text-3xl mb-3"></i>
-                    <p className="text-gray-500">No trend data available</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Claims Activity</CardTitle>
-                <CardDescription>Latest progress claims across all contracts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {recentClaims.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentClaims.map((claim) => {
-                      const contract = contracts.find(c => c.id === claim.contractId);
-                      return (
-                        <div key={claim.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3">
-                              <span className="font-medium font-mono text-lg">
-                                #{claim.number.toString().padStart(3, '0')}
-                              </span>
-                              <Badge variant="outline" className={getStatusColor(claim.status)}>
-                                {claim.status}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {contract?.name || 'Unknown Contract'}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(claim.date).toLocaleDateString('en-US', { 
-                                weekday: 'short', 
-                                year: 'numeric', 
-                                month: 'short', 
-                                day: 'numeric' 
-                              })}
-                            </p>
+          {/* Recent Activity */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Claims</CardTitle>
+              <CardDescription>
+                Latest progress claims across all contracts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recentClaims.length === 0 ? (
+                <div className="text-center py-8">
+                  <i className="fas fa-file-alt text-gray-400 text-3xl mb-3"></i>
+                  <p className="text-gray-500">No claims yet</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentClaims.map((claim) => {
+                    const contract = contracts.find(c => c.id === claim.contractId);
+                    return (
+                      <div key={claim.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium font-mono">
+                              #{claim.number.toString().padStart(3, '0')}
+                            </span>
+                            <span className={`text-sm ${getStatusColor(claim.status)}`}>
+                              {claim.status}
+                            </span>
                           </div>
-                          <div className="text-right">
-                            <p className="text-lg font-semibold font-mono">
-                              ${claim.totals.incGst.toLocaleString()}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {claim.items.length} items
-                            </p>
-                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {contract?.name || 'Unknown Contract'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(claim.date).toLocaleDateString()}
+                          </p>
                         </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <i className="fas fa-file-alt text-gray-400 text-3xl mb-3"></i>
-                    <p className="text-gray-500">No recent activity</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                        <div className="text-right">
+                          <p className="text-sm font-medium font-mono">
+                            ${claim.totals.incGst.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Quick Actions */}
         <Card className="mt-8">

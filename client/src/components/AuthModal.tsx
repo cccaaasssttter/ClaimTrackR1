@@ -17,7 +17,16 @@ export function AuthModal({ isOpen, onAuthenticated }: AuthModalProps) {
   const [timeRemaining, setTimeRemaining] = useState(300);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (!isOpen) return;
 
+    const timer = setInterval(() => {
+      const remaining = Math.floor(authManager.getTimeRemaining() / 1000);
+      setTimeRemaining(remaining);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +68,7 @@ export function AuthModal({ isOpen, onAuthenticated }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" hideCloseButton>
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <i className="fas fa-shield-alt text-2xl text-primary"></i>
@@ -101,7 +110,12 @@ export function AuthModal({ isOpen, onAuthenticated }: AuthModalProps) {
           </Button>
         </form>
 
-
+        <div className="mt-4 text-center">
+          <span className="text-sm text-gray-500">
+            <i className="fas fa-clock mr-1"></i>
+            Auto-lock after 5 minutes of inactivity
+          </span>
+        </div>
       </DialogContent>
     </Dialog>
   );
