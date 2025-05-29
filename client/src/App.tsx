@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -65,6 +65,17 @@ function MainApp() {
     initializeApp();
   }, [contracts, selectedContractId, toast]);
 
+  // Define session expiry handler
+  const handleSessionExpiry = useCallback(() => {
+    setIsAuthenticated(false);
+    authManager.logout();
+    toast({
+      title: "Session Expired",
+      description: "Please log in again",
+      variant: "destructive",
+    });
+  }, [toast]);
+
   // Session monitoring
   useEffect(() => {
     const timer = setInterval(() => {
@@ -119,16 +130,6 @@ function MainApp() {
 
   const handleAuthenticated = () => {
     setIsAuthenticated(true);
-  };
-
-  const handleSessionExpiry = () => {
-    setIsAuthenticated(false);
-    authManager.logout();
-    toast({
-      title: "Session Expired",
-      description: "Please log in again",
-      variant: "destructive",
-    });
   };
 
   const handleContractSelect = (contractId: string) => {
